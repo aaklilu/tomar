@@ -1,0 +1,65 @@
+buildscript {
+    ext {
+        springBootVersion = '1.4.0.RELEASE'
+        apacheCamelVersion = '2.18.0'
+        googleCodeVersion = '7.6.1'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+
+jar {
+    baseName = "messenger"
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    compile group: "org.springframework.boot", name: "spring-boot-starter-web"
+    compile group: "org.springframework.boot", name: "spring-boot-starter-websocket"
+    compile group: "org.springframework.boot", name: "spring-boot-devtools"
+    compile group: "org.springframework.boot", name: "spring-boot-starter-thymeleaf"
+
+    compile group: "org.webjars", name: "webjars-locator"
+    compile group: "org.webjars", name: "sockjs-client", version: "1.0.2"
+    compile group: "org.webjars", name: "stomp-websocket", version: "2.3.3"
+    compile group: "org.webjars", name: "bootstrap", version: "3.3.7"
+    compile group: "org.webjars", name: "jquery", version: "3.1.0"
+
+    //Camel
+    compile group: 'org.apache.camel', name: 'camel-spring-boot', version: apacheCamelVersion
+    compile group: 'org.apache.camel', name: 'camel-smpp', version: apacheCamelVersion
+    compile group: 'org.apache.camel', name: 'camel-mail', version: apacheCamelVersion
+
+    //Googlecode
+    compile group: 'com.googlecode.libphonenumber', name: 'libphonenumber', version: googleCodeVersion
+
+    testCompile group: "org.springframework.boot", name: "spring-boot-starter-test"
+}
+
+bootRun {
+    // It is for running application with profiles
+    // e.g. gradle bootRun -Dspring.profiles.active=dev,test
+    addResources = true
+    systemProperties = System.properties
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = project.gradleWrapperVersion
+}
+

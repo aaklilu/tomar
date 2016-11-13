@@ -1,0 +1,14 @@
+version project.version
+group "et.tomar"
+
+apply plugin: 'idea'
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = project.gradleWrapperVersion
+}

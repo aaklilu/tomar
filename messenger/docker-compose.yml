@@ -1,0 +1,37 @@
+version: "2"
+
+services:
+
+  smpphost:
+    build: ./docker/SMPPSim/.
+    container_name: smpphost
+    ports:
+      - "8088:88"
+      - "2775:2775"
+      - "2776:2776"
+
+  messenger1:
+    image: java:8
+    ports:
+      - "8081:8080"
+    links:
+      - smpphost
+    depends_on:
+      - smpphost
+    working_dir: /app
+    volumes:
+      - ./build/libs:/app
+    command: java -jar /app/messenger-1.0.0.jar --spring.profiles.active=docker --smpp.origin=2518081 --smpp.destination=8082 --smpp.username=smppclient1 --smpp.password=password
+
+  messenger2:
+    image: java:8
+    ports:
+      - "8082:8080"
+    links:
+      - smpphost
+    depends_on:
+      - smpphost
+    working_dir: /app
+    volumes:
+      - ./build/libs:/app
+    command: java -jar /app/messenger-1.0.0.jar --spring.profiles.active=docker --smpp.origin=2518082 --smpp.destination=8081 --smpp.username=smppclient2 --smpp.password=password

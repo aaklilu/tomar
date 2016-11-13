@@ -1,0 +1,50 @@
+spring:
+  resources:
+    chain:
+      enabled: true
+  messages:
+    basename: i18n/messages
+    cache-seconds: 3600 # Loaded resource bundle files cache expiration, in seconds. When set to -1, bundles are cached forever.
+  output:
+    ansi:
+      enabled: always
+---
+server:
+  port: 8081
+  contextPath: /
+---
+smpp:
+  username: smppclient1
+  password: password
+  host: 127.0.0.1
+  port: 2775
+  link-timer: 10000
+  system-type:
+  source-overrides: 'US:+01123' #override for international (US) numbers
+  address-range: '^(251929)(\d{6})' #starts with 25929, for exact match, provide the number (eg. 251929241254)
+  origin: '+251929241254' #source
+  destination: '+2519362' #destination
+  throttle:
+    timePeriodMillis: 1000
+    maximumRequestsPerPeriod: 5
+  blacklist:
+    countries:
+  smsc:
+    country: ET
+  local:
+    country: ET
+  queue:
+    inbox: 'seda:messenger.sms.inbox'
+    outbox: 'seda:messenger.sms.outbox'
+    dead-letter: 'seda:messenger.sms.failed'
+---
+websocket:
+  queue:
+    sms:
+      outbox: '/sms/outgoing'
+---
+logging:
+  file: logs/messenger.log
+  level:
+    org.apache.camel: INFO
+    et.zema: DEBUG
