@@ -21,7 +21,7 @@ services:
     working_dir: /app
     volumes:
       - ./build/libs:/app
-    command: java -jar /app/messenger-1.0.0.jar --spring.profiles.active=docker --smpp.origin=2518081 --smpp.destination=8082 --smpp.username=smppclient1 --smpp.password=password
+    command: java -jar /app/messenger-1.0.0.jar --spring.profiles.active=docker --smpp.address-range='^(\d{3})(8081)' --smpp.origin=8081 --smpp.destination=8082 --smpp.username=smppclient1 --smpp.password=password
 
   messenger2:
     image: java:8
@@ -34,4 +34,4 @@ services:
     working_dir: /app
     volumes:
       - ./build/libs:/app
-    command: java -jar /app/messenger-1.0.0.jar --spring.profiles.active=docker --smpp.origin=2518082 --smpp.destination=8081 --smpp.username=smppclient2 --smpp.password=password
+    command: java -jar /app/messenger-1.0.0.jar --spring.profiles.active=docker --smpp.address-range='^(\d{3})(8082)' --smpp.origin=8082 --smpp.destination=8081 --smpp.username=smppclient2 --smpp.password=password

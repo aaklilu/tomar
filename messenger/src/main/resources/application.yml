@@ -10,7 +10,7 @@ spring:
       enabled: always
 ---
 server:
-  port: 8081
+  port: 8080
   contextPath: /
 ---
 smpp:

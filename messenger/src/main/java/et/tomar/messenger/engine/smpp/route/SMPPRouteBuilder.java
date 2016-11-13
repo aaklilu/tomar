@@ -56,7 +56,7 @@ public class SMPPRouteBuilder extends SpringRouteBuilder {
     @Value("${smpp.password}")
     private String password;
 
-    @Value("${smpp.origin:smpp.address-range}")
+    @Value("${smpp.address-range}")
     private String addressRange;
 
     @Value("${smpp.port}")
