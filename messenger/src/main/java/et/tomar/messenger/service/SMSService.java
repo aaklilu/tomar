@@ -1,6 +1,5 @@
 package et.tomar.messenger.service;
 
-import et.tomar.messenger.http.MessageRequest;
 import et.tomar.messenger.http.MessageResponse;
 import et.tomar.messenger.util.Constants;
 import org.apache.camel.Exchange;
@@ -9,7 +8,6 @@ import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -27,11 +25,8 @@ public class SMSService implements MessageService {
     @Value("${smpp.queue.outbox}")
     private String smsOutboxQueue;
 
-    @Value("${websocket.queue.sms.outbox}")
-    private String websocketSMSOutboxQueue;
-
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
+    @Value("${smpp.queue.ui}")
+    private String uiSMSOutboxQueue;
 
     @Produce
     private ProducerTemplate producerTemplate;
@@ -43,27 +38,29 @@ public class SMSService implements MessageService {
         this.sessionCache = new HashMap<>();
     }
 
-    public void send(MessageRequest message, String sessionId) {
+    @Override
+    public void send(String from, String to, String body, String sessionId) {
 
-        sessionCache.put(message.getFrom(), sessionId);
+        sessionCache.put(from, sessionId);
 
         Map<String, Object> header = new HashMap<>();
 
-        header.put(Constants.SMS_ORIGIN, message.getFrom());
-        header.put(Constants.SMS_DESTINATION, message.getTo());
+        header.put(Constants.SMS_ORIGIN, from);
+        header.put(Constants.SMS_DESTINATION, to);
 
-        producerTemplate.sendBodyAndHeaders(smsOutboxQueue, message.getBody(), header);
+        producerTemplate.sendBodyAndHeaders(smsOutboxQueue, body, header);
     }
 
+    @Override
     public void receive(Exchange exchange) {
 
-        String from = String.valueOf(exchange.getIn().getHeader(Constants.SMS_DESTINATION_E164));
-        String to = String.valueOf(exchange.getIn().getHeader(Constants.SMS_ORIGIN_E164));
-        Object body = exchange.getIn().getBody();
-
-        this.simpMessagingTemplate.convertAndSend(websocketSMSOutboxQueue, new MessageResponse(from, to, String.valueOf(body)));
+        /**
+         * Handle incoming messages here, but for this one, we'll just relay it to the UI queue and the message will be pushed thru websocket
+         */
+        producerTemplate.send(uiSMSOutboxQueue, exchange);
     }
 
+    @Override
     public void handleDeliveryReceipt(Exchange exchange) {
 
     }

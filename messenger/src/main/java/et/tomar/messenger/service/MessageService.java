@@ -8,7 +8,7 @@ import org.apache.camel.Exchange;
  */
 public interface MessageService {
 
-    public void send(MessageRequest message, String sessionId);
+    public void send(String from, String to, String body, String sessionId);
 
     public void receive(Exchange exchange);
 

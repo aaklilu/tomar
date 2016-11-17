@@ -36,6 +36,7 @@ smpp:
   queue:
     inbox: 'seda:messenger.sms.inbox'
     outbox: 'seda:messenger.sms.outbox'
+    ui: 'seda:messenger.sms.ui'
     dead-letter: 'seda:messenger.sms.failed'
 ---
 websocket:
