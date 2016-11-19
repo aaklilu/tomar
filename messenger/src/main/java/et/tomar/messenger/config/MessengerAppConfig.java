@@ -9,8 +9,12 @@ import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.boot.yaml.DefaultProfileDocumentMatcher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -19,6 +23,9 @@ import java.util.Properties;
 @Configuration
 public class MessengerAppConfig {
 
+    @Autowired
+    private Environment environment;
+
     @Bean
     public PropertiesResolver propertiesResolver(){
 
@@ -26,15 +33,19 @@ public class MessengerAppConfig {
 
             Properties answer = new Properties();
 
+            YamlPropertiesFactoryBean yamlPropertiesFactoryBean = new YamlPropertiesFactoryBean();
+            yamlPropertiesFactoryBean.setSingleton(true);
+            yamlPropertiesFactoryBean.setDocumentMatchers(new DefaultProfileDocumentMatcher());
+
+            List<Resource> resources = new ArrayList<>();
+
             for (String path : uri) {
 
-                YamlPropertiesFactoryBean yamlPropertiesFactoryBean = new YamlPropertiesFactoryBean();
-                yamlPropertiesFactoryBean.setSingleton(true);
-                yamlPropertiesFactoryBean.setDocumentMatchers(new DefaultProfileDocumentMatcher());
-                yamlPropertiesFactoryBean.setResources(new ClassPathResource(path)/*, new ClassPathResource("application-${spring.profiles.active:default}.yml")*/);
-
-                answer.putAll(yamlPropertiesFactoryBean.getObject());
+                resources.add(new ClassPathResource(path));
             }
+
+            yamlPropertiesFactoryBean.setResources(resources.toArray(new Resource[resources.size()]));
+            answer.putAll(yamlPropertiesFactoryBean.getObject());
 
             return answer;
         };
@@ -45,7 +56,14 @@ public class MessengerAppConfig {
 
         PropertiesComponent propertiesComponent = new PropertiesComponent();
         propertiesComponent.setPropertiesResolver(propertiesResolver());
-        propertiesComponent.setLocation("application.yml");
+        List<String> locations = new ArrayList<>();
+        locations.add("application.yml");
+
+        for(String profile: environment.getActiveProfiles()){
+
+            locations.add(String.format("application-%s.yml", profile));
+        }
+        propertiesComponent.setLocations(locations.toArray(new String[locations.size()]));
 
         return propertiesComponent;
     }
