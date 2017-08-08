@@ -17,7 +17,7 @@ go to localhost:8081 and localhost:8082 to see both instances and test sending m
 
 ### Bring them up separately
 #### SMPPSim
-In thins project, SMPPSim will be running on docker container, if you want to run it ithout docker, please refer to [this](http://www.seleniumsoftware.com/user-guide.htm) documentation.
+In this project, SMPPSim will be running on docker container, if you want to run it without docker, please refer to [this](http://www.seleniumsoftware.com/user-guide.htm) documentation.
 
 ```yaml 
 docker run -d  run -d -p 8088:88 -p 2775:2775 -p 2776:2776 antenehrepos/docker-smppsim
